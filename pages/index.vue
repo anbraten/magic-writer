@@ -8,35 +8,23 @@
 import { useStorage } from '@vueuse/core';
 
 const defaultText = `
-<h2>
-  Hi there,
-</h2>
-<p>
-  this is a basic <em>basic</em> example of <strong>Tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
+<h2>🧙🏽‍♂️ writer</h2>
+<p>Writing your text with some magic can be pretty handy. Grab your wand also known as an OpenAI token with some credits and let me help you to make your life feather light: \`Wingardium Leviosa\` 🪄
 </p>
-<ul>
-  <li>
-    That’s a bullet list with one …
-  </li>
-  <li>
-    … or two list items.
-  </li>
-</ul>
 <p>
-  Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
+  PS: Be aware of the dark side of the magic, it can be dangerous if you don't know how to use it properly. Alway remember to check the ingredients of this spell and avoid copy-pasting it without understanding the consequences. 🪦 🧙🏽‍
 </p>
-<pre><code class="language-css">body {
-  display: none;
-}</code></pre>
-<p>
-  I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-</p>
-<blockquote>
-  Wow, that’s amazing. Good work, boy! 👏
-  <br />
-  — Mom
-</blockquote>
+<h2>Deployment</h2>
+<p>Deployed on Cloudflare: <a href="https://magic-writer.pages.dev">magic-writer.pages.dev</a></p>
+<h2>Development</h2>
+<p>Start the development server on <code>http://localhost:3000</code>:</p>
+<pre><code># install dependencies
+bun i
+
+# start the development server
+bun run dev
+</code></pre>
 `.trim();
 
-const text = useStorage('ai-writer:text', defaultText);
+const text = useStorage('magic-writer:text:default', defaultText);
 </script>

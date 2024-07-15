@@ -8,7 +8,7 @@ PS: Be aware of the dark side of the magic, it can be dangerous if you don't kno
 
 Deployed on Cloudflare: [magic-writer.pages.dev](https://magic-writer.pages.dev)
 
-## Development Server
+## Development
 
 Start the development server on `http://localhost:3000`:
 
