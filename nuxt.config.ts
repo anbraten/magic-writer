@@ -8,4 +8,9 @@ export default defineNuxtConfig({
       token: '',
     },
   },
+  app: {
+    head: {
+      title: '🧙🏽‍♂️ writer',
+    },
+  },
 });

@@ -1,6 +1,10 @@
 <template>
-  <div class="flex flex-col w-full rounded-md border border-gray-300">
-    <div v-if="editor && showToolbar" class="toolbar flex w-full rounded-t-md flex-wrap gap-2 border-b bg-gray-50 p-2">
+  <div class="flex flex-col w-full">
+    <div v-if="showToolbar" class="fixed top-0 left-0 w-full h-16 bg-white z-10" />
+    <div
+      v-if="editor && showToolbar"
+      class="toolbar sticky top-4 z-10 mb-4 flex w-full rounded-md flex-wrap gap-2 border bg-gray-50 p-2"
+    >
       <UDropdown :items="textTypes" :popper="{ placement: 'bottom-start' }">
         <UButton
           color="white"
@@ -92,6 +96,10 @@
       >
         <Icon name="i-tabler:line-dashed" class="h-4 w-4" />
       </button>
+
+      <div class="ml-auto flex items-center">
+        <p class="text-xl">🧙🏽‍♂️ writer</p>
+      </div>
     </div>
 
     <div class="w-full">
@@ -122,7 +130,7 @@ const editor = useEditor({
   content: content.value,
   editorProps: {
     attributes: {
-      class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl max-w-none m-4 focus:outline-none',
+      class: 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl max-w-none focus:outline-none',
     },
   },
   extensions: [
