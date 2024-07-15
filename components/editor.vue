@@ -1,105 +1,102 @@
 <template>
   <div class="flex flex-col w-full max-w-6xl mx-auto relative">
-    <div
-      v-if="editor && showToolbar"
-      class="toolbar sticky top-4 z-10 mb-4 flex w-full rounded-md flex-wrap gap-2 border bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-700 p-2"
-    >
-      <UDropdown :items="textTypes" :popper="{ placement: 'bottom-start' }">
-        <UButton
-          color="white"
-          variant="ghost"
-          :label="textTypes.flatMap((m) => m).find((t) => t.active)?.label || textTypes.flatMap((m) => m).at(0)?.label"
-          trailing-icon="i-heroicons-chevron-down-20-solid"
-        />
-      </UDropdown>
+    <Teleport to=".navigation-start" v-if="editor">
+      <div class="toolbar flex">
+        <UDropdown :items="textTypes" :popper="{ placement: 'bottom-start' }">
+          <UButton
+            color="white"
+            variant="ghost"
+            :label="
+              textTypes.flatMap((m) => m).find((t) => t.active)?.label || textTypes.flatMap((m) => m).at(0)?.label
+            "
+            trailing-icon="i-heroicons-chevron-down-20-solid"
+          />
+        </UDropdown>
 
-      <div class="my-auto h-6 border-l border-gray-300" />
+        <div class="my-auto h-6 border-l border-gray-300" />
 
-      <button
-        type="button"
-        :disabled="!editor.can().chain().focus().toggleBold().run()"
-        :class="{ 'is-active': editor.isActive('bold') }"
-        :title="$t('bold')"
-        @click="editor.chain().focus().toggleBold().run()"
-      >
-        <Icon name="i-heroicons:bold" class="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        :disabled="!editor.can().chain().focus().toggleItalic().run()"
-        :class="{ 'is-active': editor.isActive('italic') }"
-        :title="$t('italic')"
-        @click="editor.chain().focus().toggleItalic().run()"
-      >
-        <Icon name="i-heroicons:italic" class="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        :disabled="!editor.can().chain().focus().toggleStrike().run()"
-        :class="{ 'is-active': editor.isActive('strike') }"
-        :title="$t('strikethrough')"
-        @click="editor.chain().focus().toggleStrike().run()"
-      >
-        <Icon name="i-tabler:strikethrough" class="h-4 w-4" />
-      </button>
+        <button
+          type="button"
+          :disabled="!editor.can().chain().focus().toggleBold().run()"
+          :class="{ 'is-active': editor.isActive('bold') }"
+          :title="$t('bold')"
+          @click="editor.chain().focus().toggleBold().run()"
+        >
+          <Icon name="i-heroicons:bold" class="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          :disabled="!editor.can().chain().focus().toggleItalic().run()"
+          :class="{ 'is-active': editor.isActive('italic') }"
+          :title="$t('italic')"
+          @click="editor.chain().focus().toggleItalic().run()"
+        >
+          <Icon name="i-heroicons:italic" class="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          :disabled="!editor.can().chain().focus().toggleStrike().run()"
+          :class="{ 'is-active': editor.isActive('strike') }"
+          :title="$t('strikethrough')"
+          @click="editor.chain().focus().toggleStrike().run()"
+        >
+          <Icon name="i-tabler:strikethrough" class="h-4 w-4" />
+        </button>
 
-      <button
-        type="button"
-        :disabled="!editor.can().chain().focus().toggleCode().run()"
-        :class="{ 'is-active': editor.isActive('code') }"
-        :title="$t('code')"
-        @click="editor.chain().focus().toggleCode().run()"
-      >
-        <Icon name="i-tabler:code" class="h-4 w-4" />
-      </button>
+        <button
+          type="button"
+          :disabled="!editor.can().chain().focus().toggleCode().run()"
+          :class="{ 'is-active': editor.isActive('code') }"
+          :title="$t('code')"
+          @click="editor.chain().focus().toggleCode().run()"
+        >
+          <Icon name="i-tabler:code" class="h-4 w-4" />
+        </button>
 
-      <div class="my-auto h-6 border-l border-gray-300" />
+        <div class="my-auto h-6 border-l border-gray-300" />
 
-      <button
-        type="button"
-        :class="{ 'is-active': editor.isActive('bulletList') }"
-        :title="$t('bullet_list')"
-        @click="editor.chain().focus().toggleBulletList().run()"
-      >
-        <Icon name="i-tabler:list" class="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        :class="{ 'is-active': editor.isActive('orderedList') }"
-        :title="$t('numbered_list')"
-        @click="editor.chain().focus().toggleOrderedList().run()"
-      >
-        <Icon name="i-tabler:list-numbers" class="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        :class="{ 'is-active': editor.isActive('codeBlock') }"
-        :title="$t('code_block')"
-        @click="editor.chain().focus().toggleCodeBlock().run()"
-      >
-        <Icon name="i-tabler:source-code" class="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        :class="{ 'is-active': editor.isActive('blockquote') }"
-        :title="$t('quote')"
-        @click="editor.chain().focus().toggleBlockquote().run()"
-      >
-        <Icon name="i-tabler:blockquote" class="h-4 w-4" />
-      </button>
-      <button
-        type="button"
-        :class="{ 'is-active': editor.isActive('horizontalRule') }"
-        :title="$t('horizontal_rule')"
-        @click="editor.chain().focus().setHorizontalRule().run()"
-      >
-        <Icon name="i-tabler:line-dashed" class="h-4 w-4" />
-      </button>
-
-      <div class="ml-auto flex items-center">
-        <p class="text-xl">🧙🏽‍♂️ writer</p>
+        <button
+          type="button"
+          :class="{ 'is-active': editor.isActive('bulletList') }"
+          :title="$t('bullet_list')"
+          @click="editor.chain().focus().toggleBulletList().run()"
+        >
+          <Icon name="i-tabler:list" class="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-active': editor.isActive('orderedList') }"
+          :title="$t('numbered_list')"
+          @click="editor.chain().focus().toggleOrderedList().run()"
+        >
+          <Icon name="i-tabler:list-numbers" class="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-active': editor.isActive('codeBlock') }"
+          :title="$t('code_block')"
+          @click="editor.chain().focus().toggleCodeBlock().run()"
+        >
+          <Icon name="i-tabler:source-code" class="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-active': editor.isActive('blockquote') }"
+          :title="$t('quote')"
+          @click="editor.chain().focus().toggleBlockquote().run()"
+        >
+          <Icon name="i-tabler:blockquote" class="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          :class="{ 'is-active': editor.isActive('horizontalRule') }"
+          :title="$t('horizontal_rule')"
+          @click="editor.chain().focus().setHorizontalRule().run()"
+        >
+          <Icon name="i-tabler:line-dashed" class="h-4 w-4" />
+        </button>
       </div>
-    </div>
+    </Teleport>
 
     <div class="w-full mx-auto bg-white dark:bg-neutral-800 p-4 rounded-md">
       <editor-content :editor="editor" />
@@ -119,7 +116,7 @@ const content = defineModel<string>({ required: true });
 const t = (s: string) => s;
 const $t = t;
 
-const showToolbar = ref(true);
+const config = useConfig();
 
 const CustomDocument = Document.extend({
   content: 'heading block*',
@@ -147,11 +144,25 @@ const editor = useEditor({
       },
     }),
     AutocompleteExtension.configure({
+      suggestionDebounce: config.value.debounceSuggestion,
       getSuggestions: async (previousText) => {
+        if (!config.value.aiToken || !config.value.aiModel) {
+          throw new Error('Please configure AI Token and AI Model');
+        }
+
         const suggestion = await $fetch('/api/suggest', {
           method: 'POST',
-          body: JSON.stringify({ previousText }),
+          body: JSON.stringify({
+            previousText,
+            aiToken: config.value.aiToken,
+            aiModel: config.value.aiModel,
+          }),
         });
+
+        if (typeof suggestion !== 'string') {
+          throw new Error('Invalid suggestion');
+        }
+
         return suggestion;
       },
     }),
@@ -265,18 +276,18 @@ watch(content, (newValue) => {
 
 .toolbar button.is-active,
 .toolbar button:hover {
-  @apply bg-gray-200;
+  @apply bg-neutral-200 dark:bg-neutral-700;
 }
 
 ::v-deep(.tiptap .is-empty::before) {
   content: attr(data-placeholder);
-  @apply text-gray-400;
+  @apply text-neutral-300 dark:text-neutral-600;
   float: left;
   height: 0;
   pointer-events: none;
 }
 
 ::v-deep(.autocomplete-suggestion) {
-  @apply text-gray-400;
+  @apply text-neutral-300 dark:text-neutral-600;
 }
 </style>

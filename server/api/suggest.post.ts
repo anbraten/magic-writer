@@ -1,18 +1,27 @@
 import OpenAI from 'openai';
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
+  const { previousText, aiToken, aiModel } = await readBody<{
+    previousText: string;
+    aiToken: string;
+    aiModel: string;
+  }>(event);
+
+  if (!previousText || !aiToken || !aiModel) {
+    return createError({
+      status: 400,
+      statusMessage: 'previousText, aiToken, and aiModel are required',
+    });
+  }
 
   const ai = new OpenAI({
-    apiKey: config.openai.token,
+    apiKey: aiToken,
   });
-
-  const { previousText } = await readBody<{ previousText: string }>(event);
 
   // return 'Suggestion' + Date.now();
 
   const suggestion = await ai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: aiModel,
     messages: [
       {
         role: 'system',

@@ -4,7 +4,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { debounce } from './debounce';
 
 export const AutocompleteExtension = Node.create<{
-  applySuggestionKey: string;
+  applySuggestionKeys: string[];
   suggestionDebounce: number;
   getSuggestions: (previousText: string) => Promise<string | null>;
 }>({
@@ -12,7 +12,7 @@ export const AutocompleteExtension = Node.create<{
 
   addOptions() {
     return {
-      applySuggestionKey: 'Tab',
+      applySuggestionKeys: ['Tab', 'ArrowRight'],
       suggestionDebounce: 1000,
       previousTextLength: 4000,
       getSuggestions: async () => null,
@@ -26,6 +26,8 @@ export const AutocompleteExtension = Node.create<{
       const suggestion = await this.options.getSuggestions(previousText);
       cb(suggestion);
     }, this.options.suggestionDebounce);
+
+    const { applySuggestionKeys } = this.options;
 
     return [
       new Plugin({
@@ -123,7 +125,7 @@ export const AutocompleteExtension = Node.create<{
               return false;
             }
 
-            if (event.key === 'ArrowRight' || event.key === 'Tab') {
+            if (applySuggestionKeys.includes(event.key)) {
               const tr = view.state.tr;
               tr.insertText(suggestion);
               view.dispatch(tr);
