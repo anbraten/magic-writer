@@ -1,0 +1,5 @@
+<template>
+  <div class="bg-neutral-100 dark:bg-neutral-900">
+    <slot />
+  </div>
+</template>
