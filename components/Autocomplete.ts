@@ -130,6 +130,14 @@ export const AutocompleteExtension = Node.create<{
               return true;
             }
 
+            if (event.key === 'Escape') {
+              const tr = view.state.tr;
+              tr.setMeta('addToHistory', false);
+              tr.setMeta(pluginKey, { suggestion: null, decorations: DecorationSet.empty });
+              view.dispatch(tr);
+              return true;
+            }
+
             return false;
           },
         },
