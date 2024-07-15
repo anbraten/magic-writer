@@ -268,6 +268,14 @@ watch(content, (newValue) => {
   @apply bg-gray-200;
 }
 
+::v-deep(.tiptap .is-empty::before) {
+  content: attr(data-placeholder);
+  @apply text-gray-400;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 ::v-deep(.autocomplete-suggestion) {
   @apply text-gray-400;
 }
