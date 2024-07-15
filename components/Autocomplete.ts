@@ -13,70 +13,14 @@ export const AutocompleteExtension = Node.create<{
   addOptions() {
     return {
       applySuggestionKey: 'Tab',
-      suggestionDebounce: 1500,
+      suggestionDebounce: 2000,
       previousTextLength: 4000,
       getSuggestions: async () => null,
     };
   },
 
-  // addStorage() {
-  //   return {
-  //     getSuggestion: undefined,
-  //     suggestion: null,
-  //   };
-  // },
-
-  // addAttributes() {
-  //   return {
-  //     suggestion: {
-  //       default: null,
-  //       parseHTML: (element) => element.getAttribute('data-suggestion'),
-  //       renderHTML: (attributes) => {
-  //         return {
-  //           'data-suggestion': attributes.suggestion,
-  //         };
-  //       },
-  //     },
-  //   };
-  // },
-
-  // onBeforeCreate() {
-  //   this.storage.getSuggestion = debounce(async (previousText: string, cb: (suggestion: string | null) => void) => {
-  //     const suggestion = await $fetch('/api/suggest', {
-  //       method: 'POST',
-  //       body: JSON.stringify({ previousText }),
-  //     });
-
-  //     cb(suggestion);
-  //   }, this.options.suggestionDebounce);
-  // },
-
-  // addCommands() {
-  //   return {
-  //     // setSuggestion: (suggestion: string) => () => {
-  //     //   this.editor.commands.insertContent(suggestion);
-  //     //   return true;
-  //     // },
-  //     // applySuggestion: () => () => {
-  //     //   // TODO
-  //     //   return true;
-  //     // },
-  //     paragraph:
-  //       () =>
-  //       ({ commands }) => {
-  //         return commands.setNode('paragraph');
-  //       },
-  //   };
-  // },
-
-  // addKeyboardShortcuts() {
-  //   return {
-  //     [this.options.applySuggestionKey]: () => this.editor.commands.applySuggestion(),
-  //   };
-  // },
-
   addProseMirrorPlugins() {
-    const pluginKey = new PluginKey<DecorationSet>('suggestion');
+    const pluginKey = new PluginKey<{ decorations: DecorationSet; suggestion: string | null }>('suggestion');
 
     const getSuggestion = debounce(async (previousText: string, cb: (suggestion: string | null) => void) => {
       const suggestion = await this.options.getSuggestions(previousText);
@@ -88,15 +32,26 @@ export const AutocompleteExtension = Node.create<{
         key: pluginKey,
         state: {
           init() {
-            return DecorationSet.empty;
+            return {
+              decorations: DecorationSet.empty,
+              suggestion: null,
+            };
           },
           apply(tr, oldValue) {
             if (tr.getMeta(pluginKey)) {
               // Update the decoration state based on the async data
-              const { decorations } = tr.getMeta(pluginKey);
-              return decorations;
+              const { decorations, suggestion } = tr.getMeta(pluginKey);
+              return {
+                decorations,
+                suggestion,
+              };
             }
-            return tr.docChanged ? oldValue.map(tr.mapping, tr.doc) : oldValue;
+            return tr.docChanged
+              ? {
+                  decorations: oldValue.decorations.map(tr.mapping, tr.doc),
+                  suggestion: oldValue.suggestion,
+                }
+              : oldValue;
           },
         },
         view() {
@@ -108,10 +63,10 @@ export const AutocompleteExtension = Node.create<{
               const nextNode = view.state.doc.nodeAt(cursorPos);
 
               // If the cursor is not at the end of the block and we have a suggestion => hide the suggestion
-              if (nextNode && !nextNode.isBlock && pluginKey.getState(view.state)?.find().length) {
+              if (nextNode && !nextNode.isBlock && pluginKey.getState(view.state)?.suggestion !== null) {
                 const tr = view.state.tr;
                 tr.setMeta('addToHistory', false);
-                tr.setMeta(pluginKey, { decorations: DecorationSet.empty });
+                tr.setMeta(pluginKey, { suggestion: null, decorations: DecorationSet.empty });
                 view.dispatch(tr);
                 return;
               }
@@ -125,7 +80,7 @@ export const AutocompleteExtension = Node.create<{
               setTimeout(() => {
                 const tr = view.state.tr;
                 tr.setMeta('addToHistory', false);
-                tr.setMeta(pluginKey, { decorations: DecorationSet.empty });
+                tr.setMeta(pluginKey, { suggestion: null, decorations: DecorationSet.empty });
                 view.dispatch(tr);
               }, 0);
 
@@ -152,7 +107,7 @@ export const AutocompleteExtension = Node.create<{
                 const decorations = DecorationSet.create(updatedState.doc, [suggestionDecoration]);
                 const tr = view.state.tr;
                 tr.setMeta('addToHistory', false);
-                tr.setMeta(pluginKey, { decorations });
+                tr.setMeta(pluginKey, { suggestion, decorations });
                 view.dispatch(tr);
               });
             },
@@ -160,22 +115,21 @@ export const AutocompleteExtension = Node.create<{
         },
         props: {
           decorations(editorState) {
-            return pluginKey.getState(editorState);
+            return pluginKey.getState(editorState)?.decorations;
           },
           handleKeyDown(view, event) {
-            // if (event.key === 'Tab') {
-            //   const { state, dispatch } = view;
-            //   const { from, to } = state.selection;
-            //   state.doc.nodesBetween(from, to, (node, pos) => {
-            //     if (node.type.name === 'suggestion') {
-            //       const tr = state.tr;
-            //       tr.replaceWith(pos, pos + node.nodeSize, state.schema.text(node.attrs.suggestion));
-            //       dispatch(tr);
-            //       return false;
-            //     }
-            //   });
-            //   return true;
-            // }
+            const suggestion = pluginKey.getState(view.state)?.suggestion;
+            if (!suggestion) {
+              return false;
+            }
+
+            if (event.key === 'ArrowRight' || event.key === 'Tab') {
+              const tr = view.state.tr;
+              tr.insertText(suggestion);
+              view.dispatch(tr);
+              return true;
+            }
+
             return false;
           },
         },

@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const { previousText } = await readBody<{ previousText: string }>(event);
 
-  // return 'Suggestion' + Date.now() + previousText;
+  // return 'Suggestion' + Date.now();
 
   const suggestion = await ai.chat.completions.create({
     model: 'gpt-3.5-turbo',
