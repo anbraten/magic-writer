@@ -16,7 +16,9 @@ export default defineEventHandler(async (event) => {
     messages: [
       {
         role: 'system',
-        content: 'Help writing a scientific paper and suggest the next text block using the provided text.',
+        content:
+          'Help writing a scientific paper and suggest the next text block using the provided text.' +
+          ' Continue in the language of the text.',
       },
       {
         role: 'user',
